@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armada Bolivariana - Control de Provisiones</title>
+    <!-- Fuentes y Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-app: #f4f5f8;
+            --card-white: #ffffff;
+            --navy-main: #1e2530;     
+            --navy-light: #2c3544;    
+            --navy-header: #0f172a;   /* Azul marino profundo y elegante para la barra superior */
+            --accent-blue: #3b5bdb;   
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: #e8ebf0;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        /* Contenedor principal tipo Smartphone UI */
+        .phone-frame {
+            width: 100%;
+            max-width: 415px;
+            background: var(--bg-app);
+            border-radius: 36px;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 95vh;
+            max-height: 880px;
+            border: 8px solid #111827;
+            position: relative;
+        }
+
+        /* Barra superior rediseñada con Azul Marino y alto contraste */
+        .app-topbar {
+            background: var(--navy-header);
+            padding: 16px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .app-title h1 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .app-title p {
+            font-size: 0.72rem;
+            color: #94a3b8;
+        }
+
+        .badge-counter {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .badge-counter i {
+            color: #60a5fa;
+        }
+
+        /* Cuerpo Desplazable */
+        .app-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Buscador profesional */
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 10px 10px 38px;
+            border: 1px solid var(--border-color);
+            background: var(--card-white);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 91, 219, 0.1);
+        }
+
+        /* Tarjeta de Acciones */
+        .action-card {
+            background: var(--card-white);
+            border-radius: 18px;
+            padding: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-card h3 {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 9px 10px 9px 34px;
+            border: 1px solid var(--border-color);
+            background: #f9fafb;
+            border-radius: 10px;
+            font-size: 0.83rem;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
+            background: #fff;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 91, 219, 0.1);
+        }
+
+        .btn-main {
+            background: var(--navy-main);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-main:hover {
+            background: var(--navy-light);
+        }
+
+        /* Animación de pulso táctil para el botón de registro */
+        .btn-pulse {
+            animation: pulseEffect 0.3s ease;
+        }
+
+        @keyframes pulseEffect {
+            0% { transform: scale(1); background: var(--success); }
+            50% { transform: scale(0.97); }
+            100% { transform: scale(1); }
+        }
+
+        /* Secciones */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .section-header h2 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--navy-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .category-counter-tag {
+            font-size: 0.72rem;
+            background: #e2e8f0;
+            color: #475569;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Tarjetas de productos con semáforo */
+        .products-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .product-card {
+            background: var(--card-white);
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .product-card.stock-ok::before { background: var(--success); }
+        .product-card.stock-warn::before { background: var(--warning); }
+        .product-card.stock-low::before { background: var(--danger); }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 4px;
+        }
+
+        .product-icon-box {
+            width: 36px;
+            height: 36px;
+            background: #f1f3f9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy-main);
+            font-size: 0.9rem;
+        }
+
+        .product-details h4 {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--navy-main);
+        }
+
+        .stock-badge {
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        .stock-ok-badge { background: #ecfdf5; color: var(--success); }
+        .stock-warn-badge { background: var(--warning-bg); color: #d97706; }
+        .stock-low-badge { background: var(--danger-bg); color: var(--danger); }
+
+        /* Controles */
+        .product-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-qty {
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            border: 1px solid var(--border-color);
+            background: #f9fafb;
+            color: var(--navy-main);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.1s;
+        }
+
+        .btn-qty:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-delete-item {
+            background: transparent;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            margin-left: 2px;
+        }
+
+        .btn-delete-item:hover {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        /* Historial y Acciones de Reporte */
+        .history-section {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 6px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            font-size: 0.75rem;
+            padding: 5px 8px;
+            background: #f9fafb;
+            border-radius: 7px;
+            border-left: 3px solid var(--accent-blue);
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+        }
+
+        .history-item span b {
+            color: var(--text-main);
+        }
+
+        /* Botón de reporte institucional */
+        .btn-report {
+            background: #f1f5f9;
+            color: var(--navy-main);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            padding: 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.78rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-report:hover {
+            background: #e2e8f0;
+        }
+
+        /* Estado vacío */
+        .empty-box {
+            text-align: center;
+            padding: 14px 12px;
+            background: var(--card-white);
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .empty-box p {
+            font-size: 0.78rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <!-- Barra Superior institucional en azul marino -->
+    <div class="app-topbar">
+        <div class="app-title">
+            <h1>Armada Bolivariana</h1>
+            <p>Control de provisiones DSOTEC LG</p>
+        </div>
+        <div class="badge-counter" title="Total de rubros registrados">
+            <i class="fa-solid fa-box-archive"></i> <span id="counterNum">0</span>
+        </div>
+    </div>
+
+    <!-- Cuerpo Desplazable -->
+    <div class="app-body">
+        
+        <!-- Buscador -->
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Buscar rubro en stock..." oninput="renderApp()">
+        </div>
+
+        <!-- Tarjeta para Registrar / Ingreso por Despacho -->
+        <div class="action-card">
+            <h3>Registrar / Ingresar Rubro</h3>
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-utensils"></i>
+                    <input type="text" id="itemName" placeholder="Nombre (ej. Arroz, Café, Aceite...)">
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <select id="itemCategory">
+                        <option value="Secos">Provisiones Secas</option>
+                        <option value="Congelados">Provisiones Congeladas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-wrapper" style="flex: 1.3;">
+                    <i class="fa-solid fa-hashtag"></i>
+                    <input type="number" id="itemQty" placeholder="Cant." step="0.1" min="0.1" value="1">
+                </div>
+                <div class="input-wrapper" style="flex: 1.2;">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <select id="itemUnit">
+                        <option value="kg">kg (Kilogramos)</option>
+                        <option value="g">g (Gramos)</option>
+                        <option value="L">L (Litros)</option>
+                        <option value="ml">ml (Mililitros)</option>
+                        <option value="und">Unidades</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-main" id="btnRegistrar" onclick="registrarItem()">
+                <i class="fa-solid fa-plus"></i> Registrar en Gambuza
+            </button>
+        </div>
+
+        <!-- Lista de Productos Secos -->
+        <div class="section-header">
+            <h2><i class="fa-solid fa-wheat-awn" style="color: var(--accent-blue);"></i> Provisiones Secas</h2>
+            <span class="category-counter-tag" id="countSecosTag">0 ítems</span>
+        </div>
+        <div class="products-grid" id="listSecos"></div>
+
+        <!-- Lista de Productos Congelados -->
+        <div class="section-header" style="margin-top: 4px;">
+            <h2><i class="fa-solid fa-snowflake" style="color: #0284c7;"></i> Provisiones Congeladas</h2>
+            <span class="category-counter-tag" id="countCongeladosTag">0 ítems</span>
+        </div>
+        <div class="products-grid" id="listCongelados"></div>
+
+        <!-- Registro de Consumo Diario y Reportes -->
+        <div class="history-section" style="margin-top: 4px;">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> Consumo y Movimientos</h2>
+                <button style="background:none; border:none; color:var(--accent-blue); font-size:0.75rem; font-weight:600; cursor:pointer;" onclick="limpiarHistorial()">Limpiar</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div style="font-size: 0.73rem; color: #9ca3af; text-align: center; padding: 6px;">Sin movimientos registrados hoy.</div>
+            </div>
+            <button class="btn-report" onclick="generarReporteParte()">
+                <i class="fa-solid fa-file-lines"></i> Copiar Parte Diario de Existencias
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", renderApp);
+
+    function getStorageData() {
+        return JSON.parse(localStorage.getItem('gambuza_dsoteclg_final')) || [];
+    }
+
+    function setStorageData(data) {
+        localStorage.setItem('gambuza_dsoteclg_final', JSON.stringify(data));
+    }
+
+    function getHistoryData() {
+        return JSON.parse(localStorage.getItem('gambuza_history_final')) || [];
+    }
+
+    function setHistoryData(history) {
+        localStorage.setItem('gambuza_history_final', JSON.stringify(history));
+    }
+
+    function registrarItem() {
+        const nameInput = document.getElementById('itemName');
+        const categoryInput = document.getElementById('itemCategory');
+        const qtyInput = document.getElementById('itemQty');
+        const unitInput = document.getElementById('itemUnit');
+        const btnReg = document.getElementById('btnRegistrar');
+        
+        const name = nameInput.value.trim();
+        const category = categoryInput.value;
+        const qty = parseFloat(qtyInput.value);
+        const unit = unitInput.value;
+
+        if (!name || isNaN(qty) || qty <= 0) {
+            alert("Ingresa un nombre válido y una cantidad numérica.");
+            return;
+        }
+
+        // Animación visual tipo pulso al registrar
+        btnReg.classList.add('btn-pulse');
+        setTimeout(() => btnReg.classList.remove('btn-pulse'), 300);
+
+        let inventory = getStorageData();
+        const index = inventory.findIndex(i => i.name.toLowerCase() === name.toLowerCase());
+        
+        if (index !== -1) {
+            inventory[index].qty += qty;
+            inventory[index].category = category;
+            inventory[index].unit = unit;
+            registrarHistorial(`Ingreso despacho: <b>+${qty} ${unit}</b> de <b>${name}</b>`);
+        } else {
+            inventory.push({ name, category, qty, unit });
+            registrarHistorial(`Nuevo rubro registrado: <b>${name}</b> (${qty} ${unit})`);
+        }
+
+        setStorageData(inventory);
+        nameInput.value = '';
+        qtyInput.value = '1';
+        renderApp();
+    }
+
+    function modificarCantidad(index, cambio) {
+        let inventory = getStorageData();
+        let item = inventory[index];
+        let cantidadAnterior = item.qty;
+
+        item.qty += cambio;
+        if (item.qty < 0) item.qty = 0;
+        
+        item.qty = Math.round(item.qty * 100) / 100;
+
+        setStorageData(inventory);
+
+        if (cambio < 0 && cantidadAnterior > item.qty) {
+            registrarHistorial(`Consumiste <b>${Math.abs(cambio)} ${item.unit}</b> de <b>${item.name}</b>`);
+        } else if (cambio > 0) {
+            registrarHistorial(`Recibiste despacho <b>+${cambio} ${item.unit}</b> de <b>${item.name}</b>`);
+        }
+
+        renderApp();
+    }
+
+    function registrarHistorial(textoAccion) {
+        let history = getHistoryData();
+        const fechaHora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        history.unshift({
+            texto: textoAccion,
+            tiempo: fechaHora
+        });
+
+        if (history.length > 15) history.pop();
+        setHistoryData(history);
+    }
+
+    function limpiarHistorial() {
+        localStorage.removeItem('gambuza_history_final');
+        renderApp();
+    }
+
+    function eliminarItem(index) {
+        let inventory = getStorageData();
+        let itemName = inventory[index].name;
+        inventory.splice(index, 1);
+        setStorageData(inventory);
+        registrarHistorial(`Rubro eliminado: <b>${itemName}</b>`);
+        renderApp();
+    }
+
+    function generarReporteParte() {
+        const inventory = getStorageData();
+        if (inventory.length === 0) {
+            alert("No hay rubros en existencia para generar el reporte.");
+            return;
+        }
+
+        let textoReporte = "📋 *PARTE DE PROVISIONES - ARMADA BOLIVARIANA*\n";
+        textoReporte += "🏢 *Control DSOTEC LG*\n";
+        textoReporte += "📅 Fecha: " + new Date().toLocaleDateString() + "\n\n";
+        
+        textoReporte += "--- PROVISIONES SECAS ---\n";
+        const secos = inventory.filter(i => i.category === 'Secos');
+        if(secos.length === 0) textoReporte += "Sin registros.\n";
+        secos.forEach(i => {
+            textoReporte += `• ${i.name}: ${i.qty} ${i.unit}\n`;
+        });
+
+        textoReporte += "\n--- PROVISIONES CONGELADAS ---\n";
+        const congelados = inventory.filter(i => i.category === 'Congelados');
+        if(congelados.length === 0) textoReporte += "Sin registros.\n";
+        congelados.forEach(i => {
+            textoReporte += `• ${i.name}: ${i.qty} ${i.unit}\n`;
+        });
+
+        navigator.clipboard.writeText(textoReporte).then(() => {
+            alert("✅ ¡Parte diario copiado al portapapeles! Ya puedes pegarlo en WhatsApp o en un informe.");
+        }).catch(err => {
+            alert("No se pudo copiar automáticamente, pero los datos están listos en pantalla.");
+        });
+    }
+
+    function esCritico(item) {
+        if (item.unit === 'kg' || item.unit === 'L') return item.qty <= 0.5;
+        if (item.unit === 'g' || item.unit === 'ml') return item.qty <= 200;
+        return item.qty <= 2;
+    }
+
+    function esAdvertencia(item) {
+        if (item.unit === 'kg' || item.unit === 'L') return item.qty <= 1.5;
+        if (item.unit === 'g' || item.unit === 'ml') return item.qty <= 500;
+        return item.qty <= 5;
+    }
+
+    function renderApp() {
+        const inventory = getStorageData();
+        const history = getHistoryData();
+        const listSecos = document.getElementById('listSecos');
+        const listCongelados = document.getElementById('listCongelados');
+        const counterNum = document.getElementById('counterNum');
+        const countSecosTag = document.getElementById('countSecosTag');
+        const countCongeladosTag = document.getElementById('countCongeladosTag');
+        const historyList = document.getElementById('historyList');
+        const searchFilter = document.getElementById('searchInput').value.toLowerCase();
+
+        counterNum.innerText = inventory.length;
+        listSecos.innerHTML = '';
+        listCongelados.innerHTML = '';
+
+        const filtered = inventory.filter(item => item.name.toLowerCase().includes(searchFilter));
+
+        let countSecos = 0;
+        let countCongelados = 0;
+
+        filtered.forEach((item) => {
+            const realIndex = inventory.findIndex(i => i.name === item.name);
+
+            if (!item.unit) item.unit = 'und';
+
+            let stockClass = "stock-ok";
+            let badgeClass = "stock-ok-badge";
+            let statusText = `Stock: ${item.qty} ${item.unit}`;
+
+            if (esCritico(item)) {
+                stockClass = "stock-low";
+                badgeClass = "stock-low-badge";
+                statusText = `¡Crítico: ${item.qty} ${item.unit}!`;
+            } else if (esAdvertencia(item)) {
+                stockClass = "stock-warn";
+                badgeClass = "stock-warn-badge";
+                statusText = `Bajo: ${item.qty} ${item.unit}`;
+            }
+
+            let step = 1;
+            if (item.unit === 'kg' || item.unit === 'L') step = 0.5;
+            else if (item.unit === 'g' || item.unit === 'ml') step = 100;
+
+            const cardHTML = `
+                <div class="product-card ${stockClass}">
+                    <div class="product-info">
+                        <div class="product-icon-box">
+                            <i class="fa-solid ${item.category === 'Secos' ? 'fa-wheat-awn' : 'fa-snowflake'}"></i>
+                        </div>
+                        <div class="product-details">
+                            <h4>${item.name}</h4>
+                            <span class="stock-badge ${badgeClass}">${statusText}</span>
+                        </div>
+                    </div>
+                    <div class="product-controls">
+                        <button class="btn-qty" onclick="modificarCantidad(${realIndex}, -${step})" title="Restar/Consumir">-</button>
+                        <button class="btn-qty" onclick="modificarCantidad(${realIndex}, ${step})" title="Sumar/Despacho">+</button>
+                        <button class="btn-delete-item" onclick="eliminarItem(${realIndex})" title="Eliminar">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (item.category === 'Secos') {
+                countSecos++;
+                listSecos.innerHTML += cardHTML;
+            } else {
+                countCongelados++;
+                listCongelados.innerHTML += cardHTML;
+            }
+        });
+
+        countSecosTag.innerText = `${countSecos} ítems`;
+        countCongeladosTag.innerText = `${countCongelados} ítems`;
+
+        if (countSecos === 0) {
+            listSecos.innerHTML = `<div class="empty-box" style="padding:12px;"><p>No hay provisiones secas registradas.</p></div>`;
+        }
+        if (countCongelados === 0) {
+            listCongelados.innerHTML = `<div class="empty-box" style="padding:12px;"><p>No hay provisiones congeladas registradas.</p></div>`;
+        }
+
+        if (history.length === 0) {
+            historyList.innerHTML = `<div style="font-size: 0.73rem; color: #9ca3af; text-align: center; padding: 6px;">Sin movimientos registrados hoy.</div>`;
+        } else {
+            historyList.innerHTML = '';
+            history.forEach(h => {
+                historyList.innerHTML += `
+                    <div class="history-item">
+                        <span>${h.texto}</span>
+                        <b style="color: #64748b;">${h.tiempo}</b>
+                    </div>
+                `;
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
